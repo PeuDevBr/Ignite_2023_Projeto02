@@ -25,7 +25,7 @@ export const FormContainer = styled.div`
   color: ${(props) => props.theme['gray-100']};
   font-size: 1.125rem;
   font-weight: bold;
-  flex-wrap: wrap; 
+  flex-wrap: wrap;
   /* quando a tlea for diminuída quebra os campos em mais linhas */
 `
 
@@ -53,4 +53,67 @@ export const Separator = styled.div`
   overflow: hidden;
   display: flex;
   justify-content: center;
+`
+
+const BaseInput = styled.input`
+  background-color: transparent;
+  height: 2.5rem;
+  border: 0;
+  border-bottom: 2px solid ${(props) => props.theme['gray-500']};
+  font-weight: bold;
+  font-size: 1.125rem;
+  padding: 0 0.5rem;
+  color: ${(props) => props.theme['gray-100']};
+
+  &:focus {
+    box-shadow: none; /* retira a sombra (bordar) ao cliclar no input */
+    border-color: ${(props) => props.theme['green-500']};
+  }
+
+  &::placeholder {
+    color: ${(props) => props.theme['gray-500']};
+  }
+`
+
+export const TaskInput = styled(BaseInput)`
+  flex: 1;
+  /* como o FromContainer tem o "display: flex" o elemento expande
+   ou retrai dependendo do espaço restante*/
+
+  &::-webkit-calendar-picker-indicator {
+    display: none !important;
+  }
+`
+
+export const MinutesAmountInput = styled(BaseInput)`
+  width: 3.5rem;
+`
+
+export const StartCountdownButton = styled.button`
+  width: 100%;
+  border: 0;
+  padding: 1rem;
+  border-radius: 8px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 0.5rem;
+  font-weight: bold;
+
+  cursor: pointer;
+
+  background-color: ${(props) => props.theme['green-500']};
+  color: ${(props) => props.theme['gray-100']};
+
+  &:not(:disabled):hover {
+    /* só aplica o hover se o botão não estiver dasabilitado */
+    background-color: ${(props) => props.theme['green-700']};
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
 `

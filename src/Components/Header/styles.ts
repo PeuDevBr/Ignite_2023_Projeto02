@@ -17,6 +17,7 @@ export const HeaderContainer = styled.header`
       justify-content: center;
       align-items: center;
       color: ${(props) => props.theme['gray-100']};
+      box-shadow: none;
 
       border-top: 3px solid transparent;
       border-bottom: 3px solid transparent; /* borda será mostrada no hover */

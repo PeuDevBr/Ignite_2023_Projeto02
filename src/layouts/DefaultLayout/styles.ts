@@ -2,7 +2,7 @@ import styled from 'styled-components'
 
 export const LayoutContainer = styled.div`
   max-width: 74rem;
-  height: calc(
+  min-height: calc(
     100vh - 10rem
   ); /* -10rem => 5rem de margim em cima e 5rem em baixo*/
   margin: 5rem auto; /* auto => fica centralizado */

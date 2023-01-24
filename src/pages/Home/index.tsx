@@ -13,6 +13,7 @@ import {
   TaskInput,
   MinutesAmountInput,
 } from './styles'
+import { useState } from 'react'
 
 const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, 'Informe a tarefa '),
@@ -22,18 +23,67 @@ const newCycleFormValidationSchema = zod.object({
     .max(60, 'O ciclor precisa ser no máximo 60 minutos'),
 })
 
+interface NewCycleFormData {
+  task: string
+  minutesAmount: number
+}
+
+interface Cycle {
+  id: string
+  task: string
+  minutesAmount: number
+}
+
 export function Home() {
-  const { register, handleSubmit, watch } = useForm({
+  const [cycles, setCycles] = useState<Cycle[]>([])
+  const [activeCycleId, setActiveCycleId] = useState<string | null>(null)
+  const [amountSecondsPassed, setAmountSecondsPassed] = useState(0)
+  /* armazena quantos segundos já se passaram desde o início do ciclo */
+
+  const { register, handleSubmit, watch, reset } = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),
+    defaultValues: {
+      task: '',
+      minutesAmount: 0,
+    },
   })
 
-  function handleCreateNewCycle(data: any) {
-    console.log(data)
+  function handleCreateNewCycle(data: NewCycleFormData) {
+    const id = String(
+      new Date().getTime(),
+    ) /* retorna o time value em milessegundos */
+
+    const newCycle: Cycle = {
+      id,
+      task: data.task,
+      minutesAmount: data.minutesAmount,
+    }
+
+    setCycles((state) => [...state, newCycle])
+    setActiveCycleId(id)
+
+    reset()
   }
 
-  const task = watch('task')
-  const minutesAmount = watch('minutesAmount')
-  const isSubmitDisabled = !task || !minutesAmount
+  const activeCycle = cycles.find((cycle) => cycle.id === activeCycleId)
+  /* Percorrendo a lista de ciclos e retornando o ciclo com o cyclo.id igual ao id do ciclo ativo */
+
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
+  /* Se houver ciclo transformar o número de minutos em segundos, se não houver retorna 0 */
+  const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
+  /* reduz to total de segundos a quantidade de segundos que já passaram */
+
+  const minutesAmount = Math.floor(currentSeconds / 60)
+  /* retorna o valor inteiro da divisão dos segundos restantes por 60, retornando os minutos restantes */
+  const secondsAmount = currentSeconds % 60
+  /* retorna o valor restante da divisão após a virgula, retornando os segundos restante */
+
+  const minutes = String(minutesAmount).padStart(2, '0')
+  const seconds = String(secondsAmount).padStart(2, '0')
+
+  const inputTask = watch('task')
+  const inputMinutesAmount = watch('minutesAmount')
+  const isSubmitDisabled = !inputTask || !inputMinutesAmount
 
   return (
     <HomeContainer>
@@ -69,11 +119,11 @@ export function Home() {
         </FormContainer>
 
         <CountdownContainer>
-          <span>0</span>
-          <span>0</span>
+          <span>{minutes[0]}</span>
+          <span>{minutes[1]}</span>
           <Separator>:</Separator>
-          <span>0</span>
-          <span>0</span>
+          <span>{seconds[0]}</span>
+          <span>{seconds[1]}</span>
         </CountdownContainer>
 
         <StartCountdownButton disabled={isSubmitDisabled} type="submit">

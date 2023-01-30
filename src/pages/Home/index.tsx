@@ -20,7 +20,7 @@ const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, 'Informe a tarefa '),
   minutesAmount: zod
     .number()
-    .min(5, 'O ciclor precisa ser no mínimo 5 minutos')
+    .min(1, 'O ciclor precisa ser no mínimo 5 minutos')
     .max(60, 'O ciclor precisa ser no máximo 60 minutos'),
 })
 
@@ -35,6 +35,7 @@ interface Cycle {
   minutesAmount: number
   startDate: Date
   interruptDate?: Date
+  finishedtDate?: Date
 }
 
 export function Home() {
@@ -74,8 +75,8 @@ export function Home() {
   /* Percorrendo a lista de ciclos e retornando o ciclo com o cyclo.id igual ao id do ciclo ativo */
 
   function handleInterruptCycle() {
-    setCycles(
-      cycles.map((cycle) => {
+    setCycles((state) =>
+      state.map((cycle) => {
         if (cycle.id === activeCycleId) {
           return { ...cycle, interruptDate: new Date() }
         } else {
@@ -85,26 +86,49 @@ export function Home() {
     )
 
     setActiveCycleId(null)
+
+    document.title = `Ignite Timer`
   }
+
+  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
+  /* Se houver ciclo transformar o número de minutos em segundos, se não houver retorna 0 */
 
   useEffect(() => {
     let interval: number
 
     if (activeCycle) {
       interval = setInterval(() => {
-        setAmountSecondsPassed(
-          differenceInSeconds(new Date(), activeCycle.startDate),
+        const secondsDifference = differenceInSeconds(
+          new Date(),
+          activeCycle.startDate,
         )
+        if (secondsDifference >= totalSeconds) {
+          setCycles((state) =>
+            state.map((cycle) => {
+              if (cycle.id === activeCycleId) {
+                return { ...cycle, finishedtDate: new Date() }
+              } else {
+                return cycle
+              }
+            }),
+          )
+
+          setAmountSecondsPassed(totalSeconds)
+          clearInterval(interval)
+
+          setActiveCycleId(null)
+
+          document.title = `Ignite Timer`
+        } else {
+          setAmountSecondsPassed(secondsDifference)
+        }
       }, 1000)
 
       return () => {
         clearInterval(interval)
       }
     }
-  }, [activeCycle])
-
-  const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
-  /* Se houver ciclo transformar o número de minutos em segundos, se não houver retorna 0 */
+  }, [activeCycle, totalSeconds, activeCycleId])
 
   const currentSeconds = activeCycle ? totalSeconds - amountSecondsPassed : 0
   /* reduz to total de segundos a quantidade de segundos que já passaram */
@@ -152,8 +176,8 @@ export function Home() {
             type="number"
             id="minutesAmount"
             placeholder="00"
-            step={5} /* acrescenta/diminui de 5 em 5 */
-            min={5}
+            step={1} /* acrescenta/diminui de 5 em 5 */
+            min={1}
             max={60}
             disabled={!!activeCycle}
             {...register('minutesAmount', { valueAsNumber: true })}

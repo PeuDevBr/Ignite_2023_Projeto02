@@ -10,7 +10,7 @@ export function Countdown() {
     amountSecondsPassed,
     setSecondsPassed,
     markCurrentCycleAsFinished,
-    markActiveCycleIdAsNull,
+    markFinishedCycleIdAsNull,
   } = useContext(CyclesContext)
 
   const totalSeconds = activeCycle ? activeCycle.minutesAmount * 60 : 0
@@ -23,12 +23,12 @@ export function Countdown() {
       interval = setInterval(() => {
         const secondsDifference = differenceInSeconds(
           new Date(),
-          activeCycle.startDate,
+          new Date (activeCycle.startDate),
         )
         if (secondsDifference >= totalSeconds) {
           markCurrentCycleAsFinished()
 
-          markActiveCycleIdAsNull()
+          markFinishedCycleIdAsNull()
 
           setSecondsPassed(totalSeconds)
           clearInterval(interval)
@@ -48,7 +48,7 @@ export function Countdown() {
     totalSeconds,
     activeCycleId,
     markCurrentCycleAsFinished,
-    markActiveCycleIdAsNull,
+    markFinishedCycleIdAsNull,
     setSecondsPassed,
   ])
 
@@ -65,7 +65,7 @@ export function Countdown() {
 
   useEffect(() => {
     if (activeCycle) {
-      document.title = `Ignite Countdown - ${minutes}:${seconds}`
+      document.title = `${activeCycle.task} - ${minutes}:${seconds}`
     }
   }, [minutes, seconds, activeCycle])
 
